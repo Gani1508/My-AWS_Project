@@ -1,14 +1,7 @@
 version: 0.2
 
 phases:
-  install:
-    runtime-versions:
-      docker: 19
-    commands:
-      # Installing AWS CLI and Docker (if not already present)
-      - echo "Installing dependencies"
-      - aws --version
-      - docker --version
+  
   pre_build:
     commands:
       - echo "Installing dependencies..."
