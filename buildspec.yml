@@ -1,30 +1,38 @@
 version: 0.2
 
-env:
-  parameter-store:
-    DOCKER_REGISTRY_USERNAME: /myapp/docker-credentials/username
-    DOCKER_REGISTRY_PASSWORD: /myapp/docker-credentials/password
-    DOCKER_REGISTRY_URL: /myapp/docker-registry/url
 phases:
   install:
     runtime-versions:
-      python: 3.11
+      docker: 19
+    commands:
+      # Installing AWS CLI and Docker (if not already present)
+      - echo "Installing dependencies"
+      - aws --version
+      - docker --version
   pre_build:
     commands:
-      - echo "Installing dependencies..."
-      - pip install -r day-13/simple-python-app/requirements.txt
+      # Setting up AWS ECR login
+      - echo "Logging in to Amazon ECR"
+      - $(aws ecr get-login --no-include-email --region $AWS_DEFAULT_REGION)
+      - REPOSITORY_URI=703671905249.dkr.ecr.us-east-1.amazonaws.com/my-project-repo  # Change this with your ECR repository URI
+      - IMAGE_TAG=latest  # You can use a dynamic tag, e.g., $(date +%Y%m%d%H%M%S) or git commit hash
+      - echo "Repository URI: $REPOSITORY_URI"
+      - echo "Image Tag: $IMAGE_TAG"
+
   build:
     commands:
-      - echo "Running tests..."
-      - cd day-13/simple-python-app/
-      - echo "Building Docker image..."
-      - echo "$DOCKER_REGISTRY_PASSWORD" | docker login -u "$DOCKER_REGISTRY_USERNAME" --password-stdin "$DOCKER_REGISTRY_URL"
-      - docker build -t "$DOCKER_REGISTRY_URL/$DOCKER_REGISTRY_USERNAME/simple-python-flask-app:latest" .
-      - docker push "$DOCKER_REGISTRY_URL/$DOCKER_REGISTRY_USERNAME/simple-python-flask-app:latest"
+      # Build the Docker image
+      - echo "Building Docker image"
+      - docker build -t $REPOSITORY_URI:$IMAGE_TAG .
+      - docker tag $REPOSITORY_URI:latest $REPOSITORY_URI:$IMAGE_TAG
+
   post_build:
     commands:
-      - echo "Build completed successfully!"
+      # Push the Docker image to ECR
+      - echo "Pushing Docker image to ECR"
+      - docker push $REPOSITORY_URI:$IMAGE_TAG
+      - echo "Docker image pushed successfully!"
+
 artifacts:
   files:
     - '**/*'
-  base-directory: ../simple-python-app
