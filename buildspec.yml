@@ -8,7 +8,8 @@ phases:
       - pip install -r requirements.txt
       - echo Logging in to Amazon ECR...
       - aws --version
-      - $(aws ecr get-login --region $AWS_DEFAULT_REGION --no-include-email)
+      - aws ecr get-login-password --region $AWS_DEFAULT_REGION | docker login --username AWS --password-stdin $REPOSITORY_URI
+
       - REPOSITORY_URI=703671905249.dkr.ecr.us-east-1.amazonaws.com/my-project-repo 
 
   build:
