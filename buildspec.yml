@@ -6,6 +6,9 @@ phases:
     commands:
       - echo "Installing dependencies..."
       - pip install -r requirements.txt
+      - echo Logging in to Amazon ECR...
+      - aws --version
+      - $(aws ecr get-login --region $AWS_DEFAULT_REGION --no-include-email)
       - REPOSITORY_URI=703671905249.dkr.ecr.us-east-1.amazonaws.com/my-project-repo 
 
   build:
