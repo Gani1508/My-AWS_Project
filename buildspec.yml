@@ -15,7 +15,7 @@ phases:
       - echo "Logging in to Amazon ECR"
       - $(aws ecr get-login --no-include-email --region $AWS_DEFAULT_REGION)
       - REPOSITORY_URI=703671905249.dkr.ecr.us-east-1.amazonaws.com/my-project-repo  # Change this with your ECR repository URI
-      - IMAGE_TAG=latest  # You can use a dynamic tag, e.g., $(date +%Y%m%d%H%M%S) or git commit hash
+      - IMAGE_TAG=build-$(echo $CODEBUILD_BUILD_ID | awk -F":" '{print $2}')  # You can use a dynamic tag, e.g., $(date +%Y%m%d%H%M%S) or git commit hash
       - echo "Repository URI: $REPOSITORY_URI"
       - echo "Image Tag: $IMAGE_TAG"
 
