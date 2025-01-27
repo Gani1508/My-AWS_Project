@@ -6,4 +6,4 @@ aws ecr get-login-password --region us-east-1 | docker login --username AWS --pa
 docker pull 703671905249.dkr.ecr.us-east-1.amazonaws.com/my-project-repo:latest
 
 # Run the Docker image as a container
-echo
+docker run -d -p 5000:5000 703671905249.dkr.ecr.us-east-1.amazonaws.com/my-project-repo:latest
